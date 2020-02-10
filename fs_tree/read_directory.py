@@ -6,7 +6,7 @@ Set max_depth to limit the tree size.
 import os
 
 from node import Node
-from utils import *
+from fs_tree.utils import *
 
 
 # Traverses the given path. Returns a tree.
