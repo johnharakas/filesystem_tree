@@ -5,32 +5,60 @@ Set max_depth to limit the tree size.
 """
 import os
 
-from node import Node
 from fs_tree.utils import *
+from tree import Node, find_node
 
 
 # Traverses the given path. Returns a tree.
-def traverse(path, max_depth=20):
-    root = Node(None, 'root', path)
+def traverse(root_dir, path, max_depth=5):
+    root = Node(root_dir, 'root', path)
     current_node = root
     queue = collections.deque([])
 
-    # MUST BE TOPDOWN
-    for rootdir, dirs, files in os.walk(path, topdown=True):
-        # Loop through directories
-        for dir in dirs:
-            # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
-            # print('{} {} {}'.format(rootdir, dirs, files))
-            node = Node(name=dir, path=os.path.join(rootdir, dir), type="folder", parent=current_node)
-            queue.append(node)
-            current_node.children.append(node)
+    if not os.path.exists(path):
+        print('Not found: {}'.format(path))
 
-        # Loop through files
-        for file in files:
-            # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
-            # print('{} {} {}'.format(rootdir, dirs, files))
-            node = Node(name=file, path=os.path.join(rootdir, file), type="folder", parent=current_node)
-            current_node.children.append(node)
+    # MUST BE TOPDOWN
+    for rootdir, dirs, files in os.walk(path, topdown=True):  # Loop through directories
+        try:
+            for dir in dirs:
+                # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
+                # print('{} {} {}'.format(rootdir, dirs, files))
+                node = Node(name=dir,
+                            path=os.path.join(rootdir, dir),
+                            ftype="folder",
+                            parent=current_node,
+                            size=os.path.getsize(path),
+                            atime=os.path.getatime(path),
+                            ctime=os.path.getctime(path),
+                            mtime=os.path.getmtime(path)
+                            )
+                queue.append(node)
+                current_node.children.append(node)
+        except FileNotFoundError as e:
+            print(e)
+            pass
+
+        try:
+            for file in files:  # Loop through files
+                # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
+                # print('{} {} {}'.format(rootdir, dirs, files))
+                path = os.path.join(rootdir, file)
+                # ext = os.path.splitext(path)[1]
+                # print(ext)
+                node = Node(name=file,
+                            path=os.path.join(rootdir, file),
+                            ftype="file",
+                            parent=current_node,
+                            size=os.path.getsize(path),
+                            atime=os.path.getatime(path),
+                            ctime=os.path.getctime(path),
+                            mtime=os.path.getmtime(path),
+                            )
+                current_node.children.append(node)
+        except FileNotFoundError as e:
+            print(e)
+            pass
 
         if len(queue) > 0:
             current_node = queue.popleft()
@@ -42,6 +70,18 @@ def traverse(path, max_depth=20):
 
 # Testing
 def foo():
+    root_dir = '.mozilla'
     path = '/home/user/.mozilla'
-    root = traverse(path)
-    BFS(root)
+    root = traverse(root_dir, path)
+    traversed = BFS(root)
+    print(traversed)
+    target = 'profiles.ini'
+    node = find_node(root, target)
+    if node:
+        print('Found: %s' % target)
+        node.print_details()
+    else:
+        print('%s not found.' % target)
+
+
+foo()
