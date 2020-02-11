@@ -63,7 +63,7 @@ class Folder(Node):
         super().__init__(name, path, parent)
 
     def __repr__(self):
-        return "<Folder {}>".format(self.name)
+        return "<Folder {}>".format(self.path)
 
     def add_child(self, node):
         if type(node) is Folder:
@@ -82,7 +82,7 @@ class File(Node):
         self.ext = os.path.splitext(self.path)[1]
 
     def __repr__(self):
-        return "<File {}>".format(self.name)
+        return "<File {}>".format(self.path)
 
 
 def find_node(root: Node, target: str) -> Union[Node, Folder, File, None]:
@@ -151,7 +151,6 @@ def make_random_nodes(node, max_files=2, max_folders=2, max_depth=False):
                 path=new_path,
                 parent=node
             )
-            print(new_node)
             node.add_child(new_node)
 
     num_files = random.randint(1, max_files)
