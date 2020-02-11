@@ -6,12 +6,12 @@ Set max_depth to limit the tree size.
 import os
 
 from fs_tree.utils import *
-from tree import Node, find_node
+from tree import Node, File, Folder, find_node
 
 
 # Traverses the given path. Returns a tree.
 def traverse(root_dir, path, max_depth=5):
-    root = Node(root_dir, 'root', path)
+    root = Folder(root_dir, path, None)
     current_node = root
     queue = collections.deque([])
 
@@ -24,15 +24,10 @@ def traverse(root_dir, path, max_depth=5):
             for dir in dirs:
                 # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
                 # print('{} {} {}'.format(rootdir, dirs, files))
-                node = Node(name=dir,
-                            path=os.path.join(rootdir, dir),
-                            ftype="folder",
-                            parent=current_node,
-                            size=os.path.getsize(path),
-                            atime=os.path.getatime(path),
-                            ctime=os.path.getctime(path),
-                            mtime=os.path.getmtime(path)
-                            )
+                node = Folder(name=dir,
+                              path=os.path.join(rootdir, dir),
+                              parent=current_node
+                              )
                 queue.append(node)
                 current_node.children.append(node)
         except FileNotFoundError as e:
@@ -44,16 +39,9 @@ def traverse(root_dir, path, max_depth=5):
                 # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
                 # print('{} {} {}'.format(rootdir, dirs, files))
                 path = os.path.join(rootdir, file)
-                # ext = os.path.splitext(path)[1]
-                # print(ext)
-                node = Node(name=file,
+                node = File(name=file,
                             path=os.path.join(rootdir, file),
-                            ftype="file",
                             parent=current_node,
-                            size=os.path.getsize(path),
-                            atime=os.path.getatime(path),
-                            ctime=os.path.getctime(path),
-                            mtime=os.path.getmtime(path),
                             )
                 current_node.children.append(node)
         except FileNotFoundError as e:
@@ -71,7 +59,7 @@ def traverse(root_dir, path, max_depth=5):
 # Testing
 def foo():
     root_dir = '.mozilla'
-    path = '/home/user/.mozilla'
+    path = '/home/modp/.mozilla'
     root = traverse(root_dir, path)
     traversed = BFS(root)
     print(traversed)
@@ -82,6 +70,7 @@ def foo():
         node.print_details()
     else:
         print('%s not found.' % target)
+    return root
 
 
-foo()
+root = foo()
