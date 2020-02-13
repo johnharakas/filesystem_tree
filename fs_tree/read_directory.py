@@ -10,7 +10,7 @@ from tree import Node, File, Folder, find_node
 
 
 # Traverses the given path. Returns a tree.
-def traverse(root_dir, path, max_depth=5):
+def traverse(root_dir, path, max_depth=10):
     root = Folder(root_dir, path, None)
     current_node = root
     queue = collections.deque([])
@@ -38,7 +38,7 @@ def traverse(root_dir, path, max_depth=5):
             for file in files:  # Loop through files
                 # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
                 # print('{} {} {}'.format(rootdir, dirs, files))
-                path = os.path.join(rootdir, file)
+                # path = os.path.join(rootdir, file)
                 node = File(name=file,
                             path=os.path.join(rootdir, file),
                             parent=current_node,

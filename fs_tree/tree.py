@@ -6,6 +6,7 @@ import collections
 import os
 import random
 from typing import Optional, Union
+import utils
 
 
 class Node:
@@ -53,16 +54,6 @@ class Folder(Node):
     def __repr__(self):
         return "<Folder {}>".format(self.path)
 
-    def add_child(self, node):
-        if type(node) is Folder:
-            if not os.path.exists(node.path):
-                os.mkdir(node.path + '/')
-        if type(node) is File:
-            filepath = node.path + '.txt'
-            with open(filepath, 'w') as file:
-                file.write(node.path)
-        self.children.append(node)
-
     def make_child(self, name, path, node_type):
         child = None
         if node_type is Folder:
@@ -106,13 +97,11 @@ def make_random_tree(directory, max_depth=2, max_files=2, max_folders=2):  # TOD
     """
     Make a random directory tree.
     """
-    path = directory + '/'  # TODO: Fix path and directory arguments.
+    path = directory  # TODO: Fix path and directory arguments.
 
     # For debugging/testing:
-    import shutil
-    if os.path.exists(path):
-        shutil.rmtree(path)
-    print('Making: %s' % path)
+    # utils.rm_directory(path)
+
     os.mkdir(path)
 
     root = Folder('root', path, None)
@@ -153,13 +142,11 @@ def make_random_nodes(node, max_files=2, max_folders=2, max_depth=False):
                 node.path,
                 'dir' + str(node.depth) + str(d)
             )
-            # new_path = node.path + 'dir' + str(node.depth) + str(d) + '/'
             node.make_child(new_name, new_path, node_type=Folder)
 
     num_files = random.randint(1, max_files)
     for d in range(num_files):
         new_name = '{}'.format(d)
-        # new_path = node.path + 'file' + str(d)
         new_path = os.path.join(
             node.path,
             'file' + str(d)

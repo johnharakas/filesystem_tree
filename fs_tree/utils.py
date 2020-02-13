@@ -1,5 +1,7 @@
 import collections
 from datetime import datetime
+import os
+import shutil
 
 
 def BFS(root):
@@ -17,7 +19,9 @@ def BFS(root):
 
 def identical_tree(root1, root2):
     """
-    Check if two trees are identical by comparing paths
+    Check if two trees are identical by comparing paths.
+    Convert the child node paths into sets
+    Check if the difference is empty
     """
     q1 = collections.deque([])
     q1.append(root1)
@@ -33,7 +37,8 @@ def identical_tree(root1, root2):
             s1 = set(c.path for c in c1.children)
             s2 = set(c.path for c in c2.children)
             if len(s1 - s2) > 0:
-                print(c1.path, c2.path)
+                print(s1)
+                print(s2)
                 return False
             if c1 not in explored1:
                 q1.append(c1)
@@ -72,3 +77,8 @@ def convert_bytes(n_bytes, unit):
         'GB': 1 << 30
     }
     return n_bytes / factor[unit]
+
+
+def rm_directory(path):
+    if os.path.exists(path):
+        shutil.rmtree(path)
