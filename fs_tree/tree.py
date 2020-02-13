@@ -25,10 +25,10 @@ class Node:
         else:
             self.depth = 0
 
-        self.size = None
-        self.atime = None
-        self.ctime = None
-        self.mtime = None
+        self.size = os.path.getsize(self.path)
+        self.atime = os.path.getatime(self.path)
+        self.ctime = os.path.getctime(self.path)
+        self.mtime = os.path.getmtime(self.path)
 
     def __repr__(self):
         # TODO: Maybe make it prettier?
@@ -44,18 +44,6 @@ class Node:
             path_back.append(node)
             node = node.parent
         return list(reversed(path_back))
-
-    # TODO: can create_child() and add_child() be combined?
-    def create_child(self, name, path, type):
-        print(name, path, type)
-        node = Node(name, path, type)
-        self.children.append(node)
-
-    def get_attributes(self):
-        self.size = os.path.getsize(self.path)
-        self.atime = os.path.getatime(self.path)
-        self.ctime = os.path.getctime(self.path)
-        self.mtime = os.path.getmtime(self.path)
 
 
 class Folder(Node):
@@ -74,6 +62,20 @@ class Folder(Node):
             with open(filepath, 'w') as file:
                 file.write(node.path)
         self.children.append(node)
+
+    def make_child(self, name, path, node_type):
+        child = None
+        if node_type is Folder:
+            if not os.path.exists(path):
+                os.mkdir(path + '/')
+                child = Folder(name=name, path=path, parent=self)
+
+        if node_type is File:
+            filepath = path + '.txt'
+            with open(filepath, 'w') as file:
+                file.write(path)
+            child = File(name=name, path=filepath, parent=self)
+        self.children.append(child)
 
 
 class File(Node):
@@ -110,6 +112,7 @@ def make_random_tree(directory, max_depth=2, max_files=2, max_folders=2):  # TOD
     import shutil
     if os.path.exists(path):
         shutil.rmtree(path)
+    print('Making: %s' % path)
     os.mkdir(path)
 
     root = Folder('root', path, None)
@@ -145,22 +148,21 @@ def make_random_nodes(node, max_files=2, max_folders=2, max_depth=False):
         num_folders = random.randint(1, max_folders)
         for d in range(num_folders):
             new_name = '{}'.format(d)
-            new_path = node.path + 'dir' + str(node.depth) + str(d) + '/'
-            new_node = Folder(
-                name=new_name,
-                path=new_path,
-                parent=node
+
+            new_path = os.path.join(
+                node.path,
+                'dir' + str(node.depth) + str(d)
             )
-            node.add_child(new_node)
+            # new_path = node.path + 'dir' + str(node.depth) + str(d) + '/'
+            node.make_child(new_name, new_path, node_type=Folder)
 
     num_files = random.randint(1, max_files)
     for d in range(num_files):
         new_name = '{}'.format(d)
-        new_path = node.path + 'file' + str(d)
-        new_node = File(
-            name=new_name,
-            path=new_path,
-            parent=node
+        # new_path = node.path + 'file' + str(d)
+        new_path = os.path.join(
+            node.path,
+            'file' + str(d)
         )
-        node.add_child(new_node)
+        node.make_child(new_name, new_path, node_type=File)
     return node

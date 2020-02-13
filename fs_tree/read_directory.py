@@ -54,23 +54,3 @@ def traverse(root_dir, path, max_depth=5):
         if current_node.depth == max_depth:
             break
     return root
-
-
-# Testing
-def foo():
-    root_dir = '.mozilla'
-    path = '/home/modp/.mozilla'
-    root = traverse(root_dir, path)
-    traversed = BFS(root)
-    print(traversed)
-    target = 'profiles.ini'
-    node = find_node(root, target)
-    if node:
-        print('Found: %s' % target)
-        node.print_details()
-    else:
-        print('%s not found.' % target)
-    return root
-
-
-root = foo()
