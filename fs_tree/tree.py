@@ -31,9 +31,26 @@ class Node:
         self.ctime = os.path.getctime(self.path)
         self.mtime = os.path.getmtime(self.path)
 
+        self.as_sting = ''
+
     def __repr__(self):
         # TODO: Maybe make it prettier?
         return "<Node {}>".format(self.name)
+
+    def print_tree(self):
+        """
+        Recursively create a string representation of tree node
+        """
+
+        def _print_tree(node, level=0):
+            branch = "\t" * level + repr(node.path) + "\n"
+            for child in node.children:
+                branch += _print_tree(child, level + 1)
+            return branch
+
+        self.as_string = _print_tree(self)
+        print(self.as_string)
+        return self.as_sting
 
     def print_details(self):
         print('Node:{} depth:{} size:{} atime:{}'.format(self.name, self.depth, self.size, self.atime))

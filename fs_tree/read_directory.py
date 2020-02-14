@@ -6,7 +6,7 @@ Set max_depth to limit the tree size.
 import os
 
 from fs_tree.utils import *
-from tree import Node, File, Folder, find_node
+from tree import File, Folder
 
 
 # Traverses the given path. Returns a tree.
@@ -38,7 +38,6 @@ def traverse(root_dir, path, max_depth=10):
             for file in files:  # Loop through files
                 # print('depth: {} {} {}'.format(current_node.depth, rootdir, dirs))
                 # print('{} {} {}'.format(rootdir, dirs, files))
-                # path = os.path.join(rootdir, file)
                 node = File(name=file,
                             path=os.path.join(rootdir, file),
                             parent=current_node,

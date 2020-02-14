@@ -10,7 +10,8 @@ def test_tree_structure(path):
     Read the directory of t1: t2
     Check if t1 and t2 are identical trees
     """
-    utils.rm_directory(path)
+    # Debugging
+    # utils.rm_directory(path)
 
     t1 = tree.make_random_tree(path, max_depth=1, max_files=2, max_folders=2)
     if t1:
@@ -18,7 +19,7 @@ def test_tree_structure(path):
 
     t2 = read_directory.traverse(path, path)
     if t2:
-        print('t2 reated at %s' % t2.path)
+        print('t2 created at %s' % t2.path)
 
     print('Checking if t1 and t2 are identical.')
 
@@ -55,3 +56,5 @@ def test_read_directory():
 
 
 test_tree_structure('files/')
+t = read_directory.traverse('files', 'files')
+s = t.print_tree()

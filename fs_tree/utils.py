@@ -79,6 +79,10 @@ def convert_bytes(n_bytes, unit):
     return n_bytes / factor[unit]
 
 
-def rm_directory(path):
-    if os.path.exists(path):
+def rm_directory(path, prompt=True):
+    if os.path.exists(path) and prompt:
+        print('---- WARNING ----')
+        y = input('About to delete %s. Continue? (y/n)' % path)
+        if y.lower() != 'y':
+            return
         shutil.rmtree(path)
