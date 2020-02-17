@@ -37,6 +37,15 @@ class Node:
         # TODO: Maybe make it prettier?
         return "<Node {}>".format(self.name)
 
+    def __str__(self):
+        return self.path
+
+    def __lt__(self, other):
+        return self.path < other.path
+
+    def get(self, item):
+        return self.__dict__[item]
+
     def print_tree(self):
         """
         Recursively create a string representation of tree node
@@ -84,6 +93,7 @@ class Folder(Node):
                 file.write(path)
             child = File(name=name, path=filepath, parent=self)
         self.children.append(child)
+        self.children.sort()
 
 
 class File(Node):
@@ -95,7 +105,27 @@ class File(Node):
         return "<File {}>".format(self.path)
 
 
+def find_node_value(root, item):
+    """
+    Given a tree and class attribute returns a list.
+    e.g. returns a list of all creation dates
+    """
+    queue = collections.deque([])
+    queue.append(root)
+    explored = []
+    while len(queue) > 0:
+        node = queue.popleft()
+        for child in node.children:
+            if child not in explored:
+                queue.append(child)
+        explored.append(node.get(item))
+    return explored
+
+
 def find_node(root: Node, target: str) -> Union[Node, Folder, File, None]:
+    """
+    Given a tree and path, returns a Node
+    """
     queue = collections.deque([])
     queue.append(root)
     explored = []
@@ -170,3 +200,59 @@ def make_random_nodes(node, max_files=2, max_folders=2, max_depth=False):
         )
         node.make_child(new_name, new_path, node_type=File)
     return node
+
+
+# Breadth first traversal
+def BFS(root):
+    queue = collections.deque([])
+    queue.append(root)
+    explored = []
+    while len(queue) > 0:
+        node = queue.popleft()
+        for child in node.children:
+            if child not in explored:
+                queue.append(child)
+        explored.append(node)
+    return explored
+
+
+def tree_size(node):
+    size = node.size
+    if type(node) is Folder:
+        for child in node.children:
+            size += tree_size(child)
+    print('{0: < 7}'.format(size), node.path)
+    return size
+
+
+def identical_tree(root1, root2):
+    """
+    Check if two trees are identical by comparing paths.
+    Convert the child node paths into sets
+    Check if the difference is empty
+    """
+    q1 = collections.deque([])
+    q1.append(root1)
+    q2 = collections.deque([])
+    q2.append(root2)
+
+    explored1 = []
+    explored2 = []
+    while len(q1) > 0 and len(q2) > 0:
+        node1 = q1.popleft()
+        node2 = q2.popleft()
+        for c1, c2 in zip(sorted(node1.children), sorted(node2.children)):
+            s1 = set(c.path for c in c1.children)
+            s2 = set(c.path for c in c2.children)
+            if len(s1 - s2) > 0:
+                print(s1)
+                print(s2)
+                return False
+            if c1 not in explored1:
+                q1.append(c1)
+
+            if c2 not in explored2:
+                q2.append(c2)
+        explored1.append(node1)
+        explored2.append(node2)
+    return True

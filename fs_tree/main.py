@@ -1,5 +1,4 @@
-from fs_tree.tree import make_random_tree
-from fs_tree.utils import BFS
+from fs_tree.tree import make_random_tree, BFS
 
 
 def main():

@@ -1,69 +1,19 @@
 import collections
 from datetime import datetime
 import os
+import random
+import string
 import shutil
 
 
-def BFS(root):
-    queue = collections.deque([])
-    queue.append(root)
-    explored = []
-    while len(queue) > 0:
-        node = queue.popleft()
-        for child in node.children:
-            if child not in explored:
-                queue.append(child)
-        explored.append(node)
-    return explored
-
-
-def identical_tree(root1, root2):
-    """
-    Check if two trees are identical by comparing paths.
-    Convert the child node paths into sets
-    Check if the difference is empty
-    """
-    q1 = collections.deque([])
-    q1.append(root1)
-    q2 = collections.deque([])
-    q2.append(root2)
-
-    explored1 = []
-    explored2 = []
-    while len(q1) > 0 and len(q2) > 0:
-        node1 = q1.popleft()
-        node2 = q2.popleft()
-        for c1, c2 in zip(node1.children, node2.children):
-            s1 = set(c.path for c in c1.children)
-            s2 = set(c.path for c in c2.children)
-            if len(s1 - s2) > 0:
-                print(s1)
-                print(s2)
-                return False
-            if c1 not in explored1:
-                q1.append(c1)
-
-            if c2 not in explored2:
-                q2.append(c2)
-        explored1.append(node1)
-        explored2.append(node2)
-    return True
-
-
-def get_file_sizes(root):
-    queue = collections.deque([])
-    queue.append(root)
-    explored = []
-    num_bytes = 0
-    while len(queue) > 0:
-        node = queue.popleft()
-        for child in node.children:
-            if child not in explored:
-                queue.append(child)
-        if node.ftype == 'file':
-            num_bytes += node.size
-        explored.append(node)
-    return num_bytes
+def path_size(path):
+    size = os.path.getsize(path)
+    if os.path.isdir(path):
+        for file in os.listdir(path):
+            child = os.path.join(path, file)
+            size += path_size(child)
+    print('{0: < 7}'.format(size), path)
+    return size
 
 
 def format_time(timestamp):
@@ -86,3 +36,7 @@ def rm_directory(path, prompt=True):
         if y.lower() != 'y':
             return
         shutil.rmtree(path)
+
+
+def random_string(n=5):
+    return ''.join(random.choices(string.ascii_lowercase, k=n))
