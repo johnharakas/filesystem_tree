@@ -9,6 +9,39 @@ from typing import Optional, Union
 import utils
 
 
+class Tree:
+    def __init__(self, root):
+        self.root = root
+        self._nodes = {}
+        self._nodes.update({root.path: root})
+
+    def add_nodes(self):
+        queue = collections.deque([])
+        queue.append(self.root)
+        explored = []
+        while len(queue) > 0:
+            node = queue.popleft()
+            for child in node.children:
+                if child not in explored:
+                    queue.append(child)
+            self._nodes.update({node.path: node})
+            explored.append(node)
+
+    @property
+    def nodes(self):
+        return self._nodes
+
+    def __getitem__(self, path):
+        return self._nodes[path]
+
+    def __setitem__(self, path, node):
+        print('setting')
+        self._nodes.update({path: node})
+
+    def __contains__(self, item):
+        return [node for node in self._nodes if node == item]
+
+
 class Node:
     def __init__(self, name, path, parent=None, children=None):
 
@@ -256,3 +289,14 @@ def identical_tree(root1, root2):
         explored1.append(node1)
         explored2.append(node2)
     return True
+
+
+def DFS(root):
+    q = collections.deque([root])
+    visited = []
+    while len(q) > 0:
+        node = q.pop()
+        for child in node.children:
+            q.append(child)
+        visited.append(node)
+    return visited
